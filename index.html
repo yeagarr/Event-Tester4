@@ -50,6 +50,11 @@
       --easeSnappy: cubic-bezier(.2,1,.2,1);
 
       --ring: rgba(255,211,110,.42);
+
+      --safeT: env(safe-area-inset-top, 0px);
+      --safeB: env(safe-area-inset-bottom, 0px);
+      --safeL: env(safe-area-inset-left, 0px);
+      --safeR: env(safe-area-inset-right, 0px);
     }
 
     /* =========================
@@ -67,24 +72,29 @@
         radial-gradient(900px 720px at 55% 95%, rgba(160,120,255,.10), transparent 60%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow-x:hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      padding: var(--safeT) var(--safeR) var(--safeB) var(--safeL);
     }
     a{ color:inherit; text-decoration:none; }
     button, input{ font: inherit; color: inherit; }
+    button{ -webkit-tap-highlight-color: transparent; }
+    :where(button, [role="button"], input){ touch-action: manipulation; }
 
     .wrap{
       min-height:100%;
       display:grid;
       place-items:center;
-      padding: 28px 18px 42px;
+      padding: calc(26px + var(--safeT)) 18px calc(40px + var(--safeB));
     }
 
     /* =========================
-      BLOK 5 — BACKDROP NOISE + SPARKS
+      BLOK 5 — BACKDROP NOISE + SPARKS (lebih lembut + stabil)
     ========================== */
     .noise{
       pointer-events:none;
       position:fixed; inset:0;
-      opacity:.11;
+      opacity:.10;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
       mix-blend-mode: overlay;
     }
@@ -97,7 +107,8 @@
         radial-gradient(circle at 50% 75%, rgba(255,255,255,.06), transparent 36%);
       animation: drift 14s var(--easeSoft) infinite alternate;
       filter: blur(18px) saturate(1.25);
-      opacity:.95;
+      opacity:.92;
+      will-change: transform;
     }
     @keyframes drift{
       0%{ transform: translate3d(-1.2%, -1.1%, 0) scale(1.02); }
@@ -105,7 +116,7 @@
     }
 
     /* =========================
-      BLOK 6 — CARD LAYOUT
+      BLOK 6 — CARD LAYOUT (edge glow lebih premium)
     ========================== */
     .card{
       width:min(980px, 100%);
@@ -116,6 +127,8 @@
       overflow:hidden;
       position:relative;
       backdrop-filter: blur(18px) saturate(1.25);
+      -webkit-backdrop-filter: blur(18px) saturate(1.25);
+      isolation:isolate;
     }
     .card::before{
       content:"";
@@ -126,6 +139,15 @@
       opacity:.75;
       filter: blur(1px);
       pointer-events:none;
+      z-index:0;
+    }
+    .card::after{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), transparent 30%, rgba(0,0,0,.14));
+      opacity:.35;
+      z-index:0;
     }
 
     .head{
@@ -136,6 +158,7 @@
       align-items:flex-start;
       justify-content:space-between;
       flex-wrap:wrap;
+      z-index:1;
     }
     .titleWrap{ min-width: 240px; }
     h1{
@@ -163,6 +186,7 @@
       display:flex; gap:10px; align-items:center;
       box-shadow: var(--shadow2);
       backdrop-filter: blur(10px) saturate(1.2);
+      -webkit-backdrop-filter: blur(10px) saturate(1.2);
     }
     .pill b{ font-size: 12.5px; letter-spacing:.2px; }
     .pill span{ font-size: 12px; color: var(--muted); }
@@ -174,10 +198,13 @@
       grid-template-columns: 1.1fr .9fr;
       gap: 16px;
       align-items:stretch;
+      z-index:1;
     }
     @media (max-width: 860px){
       .grid{ grid-template-columns: 1fr; }
       .pillRow{ justify-content:flex-start; }
+      .head{ padding: 20px 18px 0; }
+      .grid{ padding: 16px 18px 18px; }
     }
 
     .pane{
@@ -191,7 +218,7 @@
     .paneInner{ padding: 16px; position:relative; }
 
     /* =========================
-      BLOK 7 — INPUT / BUTTONS (lebih modern)
+      BLOK 7 — INPUT / BUTTONS (lebih responsif + press feel)
     ========================== */
     .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
     .label{ font-size: 12px; color: var(--muted); }
@@ -226,20 +253,24 @@
       user-select:none;
       position:relative;
       overflow:hidden;
+      will-change: transform;
     }
     .btn::after{
       content:"";
       position:absolute; inset:-1px;
       background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,.14), transparent 65%);
       transform: translateX(-60%);
-      opacity:.0;
+      opacity:0;
       transition: transform .6s var(--easeSoft), opacity .2s var(--easeOut);
       pointer-events:none;
     }
     .btn:hover::after{ opacity:.9; transform: translateX(65%); }
     .btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
-    .btn:active{ transform: translateY(0px) scale(.99); }
-    .btn:focus-visible{ outline:none; box-shadow: 0 0 0 4px rgba(255,211,110,.14), 0 10px 22px rgba(0,0,0,.35); }
+    .btn:active{ transform: translateY(0px) scale(.985); filter: brightness(1.02); }
+    .btn:focus-visible{
+      outline:none;
+      box-shadow: 0 0 0 4px rgba(255,211,110,.14), 0 10px 22px rgba(0,0,0,.35);
+    }
 
     .btnPrimary{
       border-color: rgba(255,211,110,.35);
@@ -279,12 +310,12 @@
     }
 
     /* =========================
-      BLOK 8 — STAGE (lebih “premium”)
+      BLOK 8 — STAGE (lebih adaptif untuk mobile)
     ========================== */
     .stage{
       display:grid;
       place-items:center;
-      min-height: 380px;
+      min-height: clamp(320px, 48vh, 420px);
       padding: 14px 12px 18px;
       position:relative;
       border-radius: 16px;
@@ -306,17 +337,32 @@
       opacity:.35;
       animation: stageGlow 9s var(--easeSoft) infinite alternate;
       pointer-events:none;
+      will-change: transform;
+    }
+    .stage::after{
+      content:"";
+      position:absolute; inset:-10%;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,211,110,.08), transparent 28%),
+        radial-gradient(circle at 85% 25%, rgba(255,47,63,.07), transparent 30%),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,.06), transparent 32%);
+      filter: blur(18px);
+      opacity:.65;
+      pointer-events:none;
+      animation: stageMist 11s var(--easeSoft) infinite alternate;
+      will-change: transform;
     }
     @keyframes stageGlow{
       0%{ transform: translate3d(-1%, -1%, 0) rotate(-6deg) scale(1.02); }
       100%{ transform: translate3d(1%, 1%, 0) rotate(6deg) scale(1.06); }
     }
+    @keyframes stageMist{
+      0%{ transform: translate3d(-.8%, .4%, 0) scale(1.01); }
+      100%{ transform: translate3d(.9%, -.6%, 0) scale(1.04); }
+    }
 
     /* =========================
-      BLOK 9 — ANGPAO 3D (MODERN)
-      - Idle float
-      - Hover tilt + foil shine
-      - Open sequence: seal pop, flap flip, letter slide bounce
+      BLOK 9 — ANGPAO 3D (MODERN + Opening keyframes lebih “niat”)
     ========================== */
     .angpaoWrap{
       position:relative;
@@ -333,8 +379,9 @@
       --lift: 0px;
       --shineX: 20%;
       --shineY: 0%;
-      width: 340px;
-      height: 230px;
+      width: min(360px, 92vw);
+      aspect-ratio: 340 / 230;
+      height: auto;
       position:relative;
       transform-style:preserve-3d;
       transform:
@@ -347,23 +394,25 @@
       user-select:none;
       cursor:pointer;
       outline:none;
+      will-change: transform, filter;
     }
 
     .angpaoIdle{
       animation: floaty 3.8s var(--easeSoft) infinite;
     }
     @keyframes floaty{
-      0%{ transform:
-        perspective(950px) translateY(0px) rotateX(var(--rx)) rotateY(var(--ry)); }
-      50%{ transform:
-        perspective(950px) translateY(-6px) rotateX(calc(var(--rx) - 1deg)) rotateY(calc(var(--ry) + 1deg)); }
-      100%{ transform:
-        perspective(950px) translateY(0px) rotateX(var(--rx)) rotateY(var(--ry)); }
+      0%{ transform: perspective(950px) translateY(0px) rotateX(var(--rx)) rotateY(var(--ry)); }
+      50%{ transform: perspective(950px) translateY(-6px) rotateX(calc(var(--rx) - 1deg)) rotateY(calc(var(--ry) + 1deg)); }
+      100%{ transform: perspective(950px) translateY(0px) rotateX(var(--rx)) rotateY(var(--ry)); }
     }
 
     .angpao:hover{
       --lift: -4px;
       filter: drop-shadow(0 28px 70px rgba(0,0,0,.62));
+    }
+    .angpao:active{
+      --lift: -1px;
+      transform: perspective(950px) translateY(var(--lift)) rotateX(var(--rx)) rotateY(var(--ry)) scale(.992);
     }
 
     .angpao.envDisabled{
@@ -381,7 +430,6 @@
       overflow:hidden;
       transform: translateZ(0);
     }
-
     /* Foil border */
     .angpao__body::before{
       content:"";
@@ -394,7 +442,6 @@
       opacity:.85;
       pointer-events:none;
     }
-
     /* Inner shading */
     .angpao__innerShade{
       position:absolute; inset:0;
@@ -405,7 +452,6 @@
       opacity:.9;
       pointer-events:none;
     }
-
     /* Subtle pattern */
     .angpao__pattern{
       position:absolute; inset:-30%;
@@ -424,7 +470,6 @@
     .angpao__pocket{
       position:absolute; left:0; right:0; bottom:0;
       height: 72%;
-      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       pointer-events:none;
     }
     .angpao__pocket::before{
@@ -456,7 +501,7 @@
           rgba(255,211,110,.36), transparent 62%),
         linear-gradient(120deg, transparent 35%, rgba(255,255,255,.10), transparent 65%);
       mix-blend-mode: screen;
-      opacity:.65;
+      opacity:.62;
       filter: blur(0.2px);
       pointer-events:none;
       transition: opacity .25s var(--easeOut);
@@ -469,8 +514,8 @@
       height: 58%;
       transform-origin: 50% 0%;
       transform: translateZ(16px) rotateX(0deg);
-      transition: transform .9s var(--easePop), filter .9s var(--easeOut);
       z-index: 5;
+      will-change: transform;
     }
     .angpao__flap::before{
       content:"";
@@ -513,7 +558,8 @@
       letter-spacing:.6px;
       color: rgba(20,10,10,.86);
       z-index: 6;
-      transition: transform .65s var(--easeSnappy), opacity .35s var(--easeOut), filter .35s var(--easeOut);
+      transition: opacity .25s var(--easeOut);
+      will-change: transform, opacity;
     }
     .angpao__seal small{
       display:block;
@@ -539,9 +585,9 @@
       bottom: 12px;
       height: 76%;
       transform: translateY(34px) translateZ(10px);
-      transition: transform .95s var(--easePop), opacity .25s var(--easeOut);
       z-index: 3;
       opacity: .98;
+      will-change: transform;
     }
 
     .letterCard{
@@ -602,7 +648,7 @@
       text-align:center;
     }
     .amount{
-      font-size: 40px;
+      font-size: clamp(34px, 5.2vw, 44px);
       font-weight: 900;
       letter-spacing: .2px;
       margin: 4px 0 10px;
@@ -634,19 +680,27 @@
       100%{ box-shadow: 0 0 0 0 rgba(255,47,63,.00); }
     }
 
+    /* Opening keyframes (lebih sinkron, terlihat “cerdas”) */
+    @keyframes sealPop {
+      0%   { transform: translate(-50%,-50%) translateZ(22px) scale(1) rotate(0deg); opacity:1; filter: blur(0); }
+      55%  { transform: translate(-50%,-54%) translateZ(22px) scale(1.06) rotate(8deg); opacity:1; }
+      100% { transform: translate(-50%,-50%) translateZ(22px) scale(.25) rotate(18deg); opacity:0; filter: blur(.35px); }
+    }
+    @keyframes flapFlip {
+      0%   { transform: translateZ(16px) rotateX(0deg); }
+      65%  { transform: translateZ(16px) rotateX(166deg); }
+      100% { transform: translateZ(16px) rotateX(170deg); }
+    }
+    @keyframes letterRise {
+      0%   { transform: translateY(34px) translateZ(10px); }
+      70%  { transform: translateY(-38px) translateZ(10px); }
+      100% { transform: translateY(-34px) translateZ(10px); }
+    }
+
     /* OPEN STATES */
-    .isOpening .angpao__seal{
-      transform: translate(-50%,-50%) translateZ(22px) scale(.35) rotate(18deg);
-      opacity:0;
-      filter: blur(.2px);
-    }
-    .isOpening .angpao__flap{
-      transform: translateZ(16px) rotateX(170deg);
-      filter: brightness(.96);
-    }
-    .isOpening .angpao__letter{
-      transform: translateY(-34px) translateZ(10px);
-    }
+    .isOpening .angpao__seal{ animation: sealPop 650ms var(--easeSnappy) forwards; }
+    .isOpening .angpao__flap{ animation: flapFlip 900ms var(--easePop) forwards; }
+    .isOpening .angpao__letter{ animation: letterRise 950ms var(--easePop) forwards; }
 
     .isOpen .angpao__flap{ transform: translateZ(16px) rotateX(170deg); }
     .isOpen .angpao__letter{ transform: translateY(-34px) translateZ(10px); }
@@ -715,16 +769,17 @@
     }
 
     /* =========================
-      BLOK 12 — TOAST / MODAL
+      BLOK 12 — TOAST / MODAL (transisi halus)
     ========================== */
     .toast{
       position: fixed;
       left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
+      bottom: calc(18px + var(--safeB));
+      transform: translateX(-50%) translateY(8px);
       background: rgba(0,0,0,.62);
       border: 1px solid rgba(255,255,255,.14);
       backdrop-filter: blur(16px) saturate(1.2);
+      -webkit-backdrop-filter: blur(16px) saturate(1.2);
       padding: 10px 12px;
       border-radius: 999px;
       box-shadow: var(--shadow2);
@@ -736,22 +791,31 @@
       transition: opacity .18s var(--easeOut), transform .18s var(--easeOut);
       font-size: 12.5px;
       color: rgba(255,255,255,.90);
-      z-index: 50;
+      z-index: 80;
     }
     .toast.show{
       opacity:1;
-      transform: translateX(-50%) translateY(-2px);
+      transform: translateX(-50%) translateY(0px);
     }
 
     .modalBack{
       position:fixed; inset:0;
       background: rgba(0,0,0,.55);
-      display:none;
+      display:grid;
       place-items:center;
       padding: 18px;
-      z-index: 60;
+      z-index: 90;
+
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+      transition: opacity .2s var(--easeOut), visibility .2s var(--easeOut);
     }
-    .modalBack.show{ display:grid; }
+    .modalBack.show{
+      opacity:1;
+      visibility:visible;
+      pointer-events:auto;
+    }
 
     .modal{
       width: min(720px, 100%);
@@ -759,9 +823,15 @@
       border:1px solid rgba(255,255,255,.16);
       background: rgba(15,10,25,.85);
       backdrop-filter: blur(18px) saturate(1.2);
+      -webkit-backdrop-filter: blur(18px) saturate(1.2);
       box-shadow: var(--shadow);
       overflow:hidden;
+      transform: translateY(10px) scale(.985);
+      transition: transform .22s var(--easeOut);
+      will-change: transform;
     }
+    .modalBack.show .modal{ transform: translateY(0) scale(1); }
+
     .modalHead{
       padding: 14px 16px;
       display:flex;
@@ -790,6 +860,7 @@
       pointer-events:none;
       opacity:0;
       transition: opacity .25s var(--easeOut);
+      z-index:2;
     }
     .confettiOn{ opacity: 1; }
 
@@ -807,6 +878,8 @@
       flex-wrap:wrap;
       justify-content:space-between;
       align-items:center;
+      position:relative;
+      z-index:1;
     }
     .footer .right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
     .linkBtn{
@@ -815,20 +888,34 @@
       padding: 7px 10px;
       border-radius: 999px;
       cursor:pointer;
+      transition: transform .18s var(--easeOut), filter .18s var(--easeOut);
+    }
+    .linkBtn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+    .linkBtn:active{ transform: translateY(0) scale(.99); }
+    .linkBtn:focus-visible{ outline:none; box-shadow: 0 0 0 4px rgba(255,211,110,.12); }
+
+    @media (max-width: 420px){
+      .pill{ width:100%; justify-content:space-between; }
+      .input{ min-width: 100%; }
+      .btn{ width:auto; }
+      .paneInner{ padding: 14px; }
     }
 
     /* Reduce motion */
     @media (prefers-reduced-motion: reduce){
-      .sparks{ animation:none; }
+      .sparks, .stage::before, .stage::after{ animation:none !important; }
       .btn, .toast, .angpao, .angpao__flap, .angpao__letter, .angpao__seal{ transition:none !important; }
-      .angpaoIdle{ animation:none; }
-      .pulseDot{ animation:none; }
+      .angpaoIdle{ animation:none !important; }
+      .pulseDot{ animation:none !important; }
+      .isOpening .angpao__seal,
+      .isOpening .angpao__flap,
+      .isOpening .angpao__letter{ animation:none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="sparks"></div>
-  <div class="noise"></div>
+  <div class="sparks" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
 
   <div class="wrap">
     <div class="card" role="application" aria-label="Angpao Keberuntungan 2026">
@@ -923,8 +1010,8 @@
                 </div>
 
                 <div class="mini" style="justify-content:center; text-align:center">
-                  <span class="tag">Animasi: seal → flap → letter (auto)</span>
-                  <span class="tag">Tip: arahkan mouse untuk efek 3D</span>
+                  <span class="tag">Opening: seal → flap → letter (keyframes)</span>
+                  <span class="tag">Desktop: hover untuk efek 3D</span>
                 </div>
               </div>
             </div>
@@ -965,7 +1052,7 @@
 
             <div style="margin-top:14px" class="mini">
               <span class="tag">Seed harian + username</span>
-              <span class="tag">Hasil konsisten untuk akun yang sama di hari itu</span>
+              <span class="tag">Hasil konsisten (akun sama, hari sama)</span>
               <span class="tag">Demo counters local</span>
             </div>
 
@@ -1061,14 +1148,35 @@
       return next - now.getTime();
     }
 
-    function lsGet(k, f=null){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):f; }catch{ return f; } }
-    function lsSet(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+    function lsGet(k, f=null){
+      try{
+        const v=localStorage.getItem(k);
+        return v?JSON.parse(v):f;
+      }catch{
+        return f;
+      }
+    }
+    function lsSet(k, v){
+      try{
+        localStorage.setItem(k, JSON.stringify(v));
+      }catch{
+        // storage bisa diblok (mode private). UI tetap jalan.
+      }
+    }
+
     function toast(msg){
       const t = $("#toast");
       t.textContent = msg;
       t.classList.add("show");
       clearTimeout(toast._tm);
       toast._tm = setTimeout(()=>t.classList.remove("show"), 2100);
+    }
+
+    const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function vib(ms=20){
+      if(prefersReducedMotion) return;
+      try{ if("vibrate" in navigator) navigator.vibrate(ms); }catch{}
     }
 
     /* =========================
@@ -1173,12 +1281,19 @@
     }
 
     /* =========================
-      BLOK 22 — CONFETTI (MINI)
+      BLOK 22 — CONFETTI (MINI) (warna variatif)
     ========================== */
     const confetti = (() => {
       const cv = $("#confetti");
       const ctx = cv.getContext("2d");
       let W=0,H=0, parts=[], raf=null, alive=false;
+
+      const palette = [
+        "rgba(255,211,110,.92)",
+        "rgba(255,47,63,.88)",
+        "rgba(255,255,255,.90)",
+        "rgba(247,178,47,.90)"
+      ];
 
       function resize(){
         const r = cv.getBoundingClientRect();
@@ -1188,15 +1303,18 @@
       }
       window.addEventListener("resize", resize, { passive:true });
 
-      function spawn(n=80){
+      function randPick(a){ return a[(Math.random()*a.length)|0]; }
+
+      function spawn(n=90){
         parts = [];
         for(let i=0;i<n;i++){
           parts.push({
             x: Math.random()*W,
             y: -Math.random()*H*0.2,
-            vx: (Math.random()-.5)*1.4*devicePixelRatio,
-            vy: (Math.random()*2.2+1.2)*devicePixelRatio,
-            r: (Math.random()*3+2.2)*devicePixelRatio,
+            vx: (Math.random()-.5)*1.6*devicePixelRatio,
+            vy: (Math.random()*2.4+1.3)*devicePixelRatio,
+            r: (Math.random()*3.4+2.0)*devicePixelRatio,
+            color: randPick(palette)
           });
         }
         alive = true;
@@ -1207,14 +1325,14 @@
         for(const p of parts){
           p.x += p.vx; p.y += p.vy; p.vy *= 1.008;
           const alpha = Math.max(0, 1 - p.y/(H*1.05));
-          ctx.globalAlpha = alpha*0.9;
+          ctx.globalAlpha = alpha*0.95;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fillStyle = "rgba(255,255,255,.9)";
+          ctx.fillStyle = p.color;
           ctx.fill();
         }
         ctx.globalAlpha = 1;
-        parts = parts.filter(p => p.y < H + 40*devicePixelRatio);
+        parts = parts.filter(p => p.y < H + 50*devicePixelRatio);
         if(parts.length) raf = requestAnimationFrame(draw);
         else {
           alive=false;
@@ -1222,8 +1340,9 @@
         }
       }
       function boom(){
+        if(prefersReducedMotion) return;
         resize();
-        spawn(85);
+        spawn(92);
         $("#confetti").classList.add("confettiOn");
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(draw);
@@ -1313,6 +1432,15 @@
       el.commitHash.textContent = shortHash(`${CONFIG.PUBLIC_SALT}|${dayKey}`);
     }
 
+    function hardResetEnvelopeUI(){
+      el.angpao.classList.remove("isOpening","isOpen");
+      el.angpao.classList.add("angpaoIdle");
+      el.resultAmount.textContent = "Rp—";
+      el.tierLabelMini.textContent = "Tier";
+      el.resultHint.textContent = "Klik “Buka Angpao” untuk melihat hasil. Setelah itu kamu bisa claim freebet.";
+      el.resultSub.textContent = "1x/hari • tidak ada kupon • freebet aktif 24 jam";
+    }
+
     function refreshDay(){
       const dk = getWibDateKey();
       if(dk !== state.dayKey){
@@ -1322,11 +1450,7 @@
         state.shared = false;
         state.result = null;
 
-        el.angpao.classList.remove("isOpening","isOpen");
-        el.resultAmount.textContent = "Rp—";
-        el.tierLabelMini.textContent = "Tier";
-        el.resultHint.textContent = "Klik “Buka Angpao” untuk melihat hasil. Setelah itu kamu bisa claim freebet.";
-        el.resultSub.textContent = "1x/hari • tidak ada kupon • freebet aktif 24 jam";
+        hardResetEnvelopeUI();
 
         initDemoCounters();
         updateCountersUI();
@@ -1348,6 +1472,8 @@
         state.result = claim;
         state.opened = true;
         el.angpao.classList.add("isOpen");
+        el.angpao.classList.remove("angpaoIdle");
+
         el.resultAmount.textContent = "Rp" + fmtIDR(claim.amount);
         el.tierLabelMini.textContent = claim.tierLabel.split("•")[0].trim() || "Tier";
         el.resultHint.textContent = `Status: sudah claim • ${claim.tierLabel}`;
@@ -1356,17 +1482,44 @@
         state.opened = false;
         state.result = null;
         el.angpao.classList.remove("isOpen","isOpening");
+        el.angpao.classList.add("angpaoIdle");
       }
     }
 
     function openSequence(){
-      // class toggles for “smart” sequence
+      // Opening keyframes → set Open setelah animasi selesai (sinkron)
       el.angpao.classList.remove("isOpen");
       el.angpao.classList.add("isOpening");
-      setTimeout(() => {
+      el.angpao.classList.remove("angpaoIdle");
+
+      clearTimeout(openSequence._tm);
+      openSequence._tm = setTimeout(() => {
         el.angpao.classList.remove("isOpening");
         el.angpao.classList.add("isOpen");
-      }, 520);
+      }, 980);
+    }
+
+    /* Count-up number (biar terasa premium) */
+    function animateAmount(to){
+      if(prefersReducedMotion){
+        el.resultAmount.textContent = "Rp" + fmtIDR(to);
+        return;
+      }
+      const start = performance.now();
+      const from = 0;
+      const dur = 650;
+
+      function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+      function step(now){
+        const t = Math.min(1, (now - start) / dur);
+        const v = Math.round(from + (to - from) * easeOutCubic(t));
+        // tampilkan dengan format, tapi tetap terlihat smooth
+        el.resultAmount.textContent = "Rp" + fmtIDR(v);
+        if(t < 1) requestAnimationFrame(step);
+        else el.resultAmount.textContent = "Rp" + fmtIDR(to);
+      }
+      requestAnimationFrame(step);
     }
 
     function openAngpao(){
@@ -1377,7 +1530,7 @@
       state.result = computeResultFor(state.user);
       state.opened = true;
 
-      el.resultAmount.textContent = "Rp" + fmtIDR(state.result.amount);
+      animateAmount(state.result.amount);
       el.tierLabelMini.textContent = state.result.tierLabel.split("•")[0].trim() || "Tier";
       el.resultHint.textContent = `${state.result.note} • ${state.result.tierLabel} • Claim untuk mengunci hadiah.`;
       el.resultSub.textContent = "Setelah claim, kamu bisa bagikan ke WhatsApp.";
@@ -1387,6 +1540,7 @@
 
       openSequence();
       confetti.boom();
+      vib(25);
       toast("Angpao terbuka! Claim untuk mengunci hadiah.");
       setEnabled();
     }
@@ -1409,6 +1563,7 @@
 
       el.resultHint.textContent = `Status: sudah claim • ${payload.tierLabel}`;
       el.resultSub.textContent = "Masa aktif: 24 jam sejak claim";
+      vib(18);
       toast("Freebet berhasil di-claim.");
       setEnabled();
     }
@@ -1434,6 +1589,7 @@
 
       bumpShared();
       updateCountersUI();
+      vib(14);
       toast("Link WhatsApp dibuka. Mantap!");
       setEnabled();
     }
@@ -1445,38 +1601,41 @@
       state.user = safe;
       el.username.value = safe;
       lsSet(kUser(), safe);
+
       loadClaimFlags();
+      vib(10);
       toast("Username tersimpan.");
       setEnabled();
     }
 
     function resetDemo(){
       const keys = [];
-      for(let i=0;i<localStorage.length;i++){
-        const k = localStorage.key(i);
-        if(k && k.startsWith("angpao2026:")) keys.push(k);
+      try{
+        for(let i=0;i<localStorage.length;i++){
+          const k = localStorage.key(i);
+          if(k && k.startsWith("angpao2026:")) keys.push(k);
+        }
+        keys.forEach(k => localStorage.removeItem(k));
+      }catch{
+        // ignore
       }
-      keys.forEach(k => localStorage.removeItem(k));
 
       state.user = "";
       el.username.value = "";
       state.opened=false; state.claimed=false; state.shared=false; state.result=null;
 
-      el.angpao.classList.remove("isOpening","isOpen");
-      el.resultAmount.textContent = "Rp—";
-      el.tierLabelMini.textContent = "Tier";
-      el.resultHint.textContent = "Klik “Buka Angpao” untuk melihat hasil. Setelah itu kamu bisa claim freebet.";
-      el.resultSub.textContent = "1x/hari • tidak ada kupon • freebet aktif 24 jam";
+      hardResetEnvelopeUI();
 
       initDemoCounters();
       updateCountersUI();
       updateCommitHashUI();
+      vib(12);
       toast("Reset demo selesai.");
       setEnabled();
     }
 
     /* =========================
-      BLOK 24 — POINTER TILT (biar “cerdas”)
+      BLOK 24 — POINTER TILT (hanya desktop hover/fine pointer)
     ========================== */
     function attachTilt(elm){
       let raf = 0;
@@ -1506,8 +1665,8 @@
         elm.style.setProperty("--shineX","20%");
         elm.style.setProperty("--shineY","0%");
       }
-      elm.addEventListener("pointermove", onMove);
-      elm.addEventListener("pointerleave", onLeave);
+      elm.addEventListener("pointermove", onMove, { passive:true });
+      elm.addEventListener("pointerleave", onLeave, { passive:true });
     }
 
     /* =========================
@@ -1534,28 +1693,58 @@
 
     // Copy link
     $("#copyLink").addEventListener("click", async () => {
-      try{ await navigator.clipboard.writeText(location.href.split("#")[0]); toast("Link event berhasil disalin."); }
-      catch{ toast("Gagal copy. Silakan copy manual dari address bar."); }
+      const link = location.href.split("#")[0];
+      try{
+        await navigator.clipboard.writeText(link);
+        vib(10);
+        toast("Link event berhasil disalin.");
+      }catch{
+        toast("Gagal copy. Silakan copy manual dari address bar.");
+      }
+    });
+
+    // Enter = simpan username (biar enak di HP)
+    el.username.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){ e.preventDefault(); saveUser(); }
     });
 
     /* =========================
-      BLOK 26 — INIT + TICK
+      BLOK 26 — INIT + TICK (lebih hemat CPU)
     ========================== */
-    function tick(){
-      refreshDay();
-      updateCountdown();
-      requestAnimationFrame(tick);
-    }
+    let clockTimer = null;
+
     function init(){
       el.modeLabel.textContent = CONFIG.MODE;
+
       initDemoCounters();
       updateCountersUI();
       updateCommitHashUI();
+
       loadUser();
       loadClaimFlags();
       setEnabled();
-      attachTilt(el.angpao);
-      tick();
+      updateCountdown();
+
+      // Tilt cuma di desktop hover/fine pointer
+      const canHover = matchMedia("(hover:hover) and (pointer:fine)").matches;
+      if(canHover && !prefersReducedMotion) attachTilt(el.angpao);
+
+      // Countdown cukup 1x/detik (lebih stabil daripada rAF)
+      clearInterval(clockTimer);
+      clockTimer = setInterval(() => {
+        refreshDay();
+        updateCountdown();
+      }, 1000);
+
+      // Saat tab balik aktif, refresh juga
+      document.addEventListener("visibilitychange", () => {
+        if(!document.hidden){
+          refreshDay();
+          updateCountdown();
+          updateCommitHashUI();
+          updateCountersUI();
+        }
+      }, { passive:true });
     }
     init();
   </script>
