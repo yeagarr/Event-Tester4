@@ -16,9 +16,9 @@
   <!-- =========================
     BLOK 2 — FONTS
   ========================== -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     /* =========================
@@ -27,6 +27,7 @@
     :root{
       --bg0:#07040e;
       --bg1:#0b0613;
+
       --glass: rgba(255,255,255,.08);
       --stroke: rgba(255,255,255,.14);
       --text: rgba(255,255,255,.92);
@@ -34,8 +35,11 @@
 
       --red:#ff2f3f;
       --red2:#b1121c;
+      --red3:#7a0b12;
+
       --gold:#ffd36e;
       --gold2:#f7b22f;
+      --amber:#ffcc66;
 
       --shadow: 0 18px 60px rgba(0,0,0,.55);
       --shadow2: 0 10px 30px rgba(0,0,0,.45);
@@ -62,9 +66,9 @@
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(1200px 700px at 18% 12%, rgba(255,47,63,.16), transparent 60%),
-        radial-gradient(900px 520px at 85% 25%, rgba(255,211,110,.14), transparent 55%),
-        radial-gradient(900px 720px at 55% 95%, rgba(160,120,255,.09), transparent 60%),
+        radial-gradient(1200px 700px at 20% 10%, rgba(255,47,63,.18), transparent 60%),
+        radial-gradient(900px 520px at 85% 25%, rgba(255,211,110,.16), transparent 55%),
+        radial-gradient(900px 720px at 55% 95%, rgba(160,120,255,.10), transparent 60%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow-x:hidden;
       -webkit-font-smoothing: antialiased;
@@ -74,7 +78,7 @@
     a{ color:inherit; text-decoration:none; }
     button, input{ font: inherit; color: inherit; }
     button{ -webkit-tap-highlight-color: transparent; }
-    :where(button, [role="button"], input){ touch-action: manipulation; }
+    :where(button,[role="button"],input){ touch-action: manipulation; }
 
     .wrap{
       min-height:100%;
@@ -84,35 +88,47 @@
     }
 
     /* =========================
-      BLOK 5 — BACKDROP NOISE (lebih ringan)
+      BLOK 5 — BACKDROP SPARKS + GRAIN (NO SVG/PNG)
+      Catatan: grain di sini pure CSS (repeat gradients), super halus.
     ========================== */
-    .noise{
-      pointer-events:none;
-      position:fixed; inset:0;
-      opacity:.10;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-      mix-blend-mode: overlay;
-    }
-
-    /* sparks dibuat statis di mobile supaya smooth */
     .sparks{
       pointer-events:none;
       position:fixed; inset:-20%;
       background:
         radial-gradient(circle at 20% 30%, rgba(255,211,110,.10), transparent 35%),
-        radial-gradient(circle at 80% 40%, rgba(255,47,63,.08), transparent 34%),
-        radial-gradient(circle at 50% 75%, rgba(255,255,255,.05), transparent 36%);
-      filter: blur(16px) saturate(1.15);
-      opacity:.85;
+        radial-gradient(circle at 80% 40%, rgba(255,47,63,.09), transparent 34%),
+        radial-gradient(circle at 50% 75%, rgba(255,255,255,.06), transparent 36%);
       animation: drift 14s var(--easeSoft) infinite alternate;
+      filter: blur(16px) saturate(1.2);
+      opacity:.92;
       will-change: transform;
     }
     @keyframes drift{
-      0%{ transform: translate3d(-1.1%, -1.0%, 0) scale(1.02); }
-      100%{ transform: translate3d(1.2%, 1.1%, 0) scale(1.05); }
+      0%{ transform: translate3d(-1.2%, -1.1%, 0) scale(1.02); }
+      100%{ transform: translate3d(1.4%, 1.2%, 0) scale(1.06); }
     }
-    @media (hover:none) and (pointer:coarse){
-      .sparks{ animation:none; opacity:.55; }
+
+    .grain{
+      pointer-events:none;
+      position:fixed; inset:0;
+      opacity:.065;
+      mix-blend-mode: overlay;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 1px, transparent 1px 4px),
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.06), transparent 45%),
+        radial-gradient(circle at 70% 80%, rgba(0,0,0,.06), transparent 55%);
+      filter: contrast(115%) brightness(110%);
+      transform: translateZ(0);
+      will-change: transform;
+      animation: grainShift 7s steps(2) infinite;
+    }
+    @keyframes grainShift{
+      0%{ transform: translate3d(0,0,0); }
+      25%{ transform: translate3d(-1px,1px,0); }
+      50%{ transform: translate3d(1px,-1px,0); }
+      75%{ transform: translate3d(1px,1px,0); }
+      100%{ transform: translate3d(0,0,0); }
     }
 
     /* =========================
@@ -126,18 +142,31 @@
       border-radius: var(--radius);
       overflow:hidden;
       position:relative;
-      backdrop-filter: blur(16px) saturate(1.15);
-      -webkit-backdrop-filter: blur(16px) saturate(1.15);
       isolation:isolate;
+    }
+    @supports (backdrop-filter: blur(18px)){
+      .card{
+        backdrop-filter: blur(18px) saturate(1.25);
+        -webkit-backdrop-filter: blur(18px) saturate(1.25);
+      }
     }
     .card::before{
       content:"";
       position:absolute; inset:-2px;
       background:
-        radial-gradient(600px 260px at 18% 10%, rgba(255,47,63,.20), transparent 55%),
-        radial-gradient(540px 280px at 85% 15%, rgba(255,211,110,.16), transparent 55%);
-      opacity:.72;
+        radial-gradient(600px 260px at 18% 10%, rgba(255,47,63,.22), transparent 55%),
+        radial-gradient(540px 280px at 85% 15%, rgba(255,211,110,.18), transparent 55%);
+      opacity:.75;
+      filter: blur(1px);
       pointer-events:none;
+      z-index:0;
+    }
+    .card::after{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), transparent 30%, rgba(0,0,0,.14));
+      opacity:.35;
       z-index:0;
     }
 
@@ -176,8 +205,12 @@
       border-radius: 999px;
       display:flex; gap:10px; align-items:center;
       box-shadow: var(--shadow2);
-      backdrop-filter: blur(10px) saturate(1.1);
-      -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    }
+    @supports (backdrop-filter: blur(10px)){
+      .pill{
+        backdrop-filter: blur(10px) saturate(1.2);
+        -webkit-backdrop-filter: blur(10px) saturate(1.2);
+      }
     }
     .pill b{ font-size: 12.5px; letter-spacing:.2px; }
     .pill span{ font-size: 12px; color: var(--muted); }
@@ -192,9 +225,10 @@
       z-index:1;
     }
     @media (max-width: 860px){
-      .grid{ grid-template-columns: 1fr; padding: 16px 18px 18px; }
+      .grid{ grid-template-columns: 1fr; }
       .pillRow{ justify-content:flex-start; }
       .head{ padding: 20px 18px 0; }
+      .grid{ padding: 16px 18px 18px; }
     }
 
     .pane{
@@ -218,7 +252,7 @@
       border-radius: 14px;
       border:1px solid rgba(255,255,255,.14);
       background:
-        radial-gradient(120px 80px at 20% 0%, rgba(255,211,110,.10), transparent 60%),
+        radial-gradient(140px 90px at 18% 0%, rgba(255,211,110,.10), transparent 60%),
         rgba(255,255,255,.06);
       padding: 11px 12px;
       outline:none;
@@ -256,11 +290,12 @@
     }
     .btn:hover::after{ opacity:.9; transform: translateX(65%); }
     .btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
-    .btn:active{ transform: translateY(0px) scale(.985); }
+    .btn:active{ transform: translateY(0px) scale(.985); filter: brightness(1.02); }
     .btn:focus-visible{
       outline:none;
       box-shadow: 0 0 0 4px rgba(255,211,110,.14), 0 10px 22px rgba(0,0,0,.35);
     }
+
     .btnPrimary{
       border-color: rgba(255,211,110,.35);
       background:
@@ -299,7 +334,7 @@
     }
 
     /* =========================
-      BLOK 8 — STAGE (lebih “adem” & stabil)
+      BLOK 8 — STAGE (lebih adaptif + hemat)
     ========================== */
     .stage{
       display:grid;
@@ -309,27 +344,52 @@
       position:relative;
       border-radius: 16px;
       background:
-        radial-gradient(420px 260px at 50% 40%, rgba(255,47,63,.08), transparent 64%),
-        radial-gradient(520px 320px at 50% 65%, rgba(255,211,110,.07), transparent 68%);
+        radial-gradient(380px 220px at 50% 38%, rgba(255,47,63,.10), transparent 62%),
+        radial-gradient(420px 260px at 50% 55%, rgba(255,211,110,.08), transparent 66%);
       overflow:hidden;
-      contain: layout paint;
+      isolation:isolate;
     }
     .stage::before{
       content:"";
-      position:absolute; inset:-18%;
-      background:
-        radial-gradient(circle at 22% 25%, rgba(255,211,110,.08), transparent 34%),
-        radial-gradient(circle at 78% 30%, rgba(255,47,63,.06), transparent 36%),
-        radial-gradient(circle at 50% 78%, rgba(255,255,255,.05), transparent 38%);
-      filter: blur(14px);
-      opacity:.65;
+      position:absolute; inset:-35%;
+      background: conic-gradient(from 180deg at 50% 50%,
+        rgba(255,211,110,.10),
+        rgba(255,47,63,.08),
+        rgba(255,255,255,.05),
+        rgba(255,47,63,.07),
+        rgba(255,211,110,.10));
+      filter: blur(32px);
+      opacity:.32;
+      animation: stageGlow 10s var(--easeSoft) infinite alternate;
       pointer-events:none;
+      will-change: transform;
+      z-index:0;
+    }
+    .stage::after{
+      content:"";
+      position:absolute; inset:-10%;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,211,110,.08), transparent 28%),
+        radial-gradient(circle at 85% 25%, rgba(255,47,63,.07), transparent 30%),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,.06), transparent 32%);
+      filter: blur(16px);
+      opacity:.6;
+      pointer-events:none;
+      animation: stageMist 12s var(--easeSoft) infinite alternate;
+      will-change: transform;
+      z-index:0;
+    }
+    @keyframes stageGlow{
+      0%{ transform: translate3d(-1%, -1%, 0) rotate(-6deg) scale(1.02); }
+      100%{ transform: translate3d(1%, 1%, 0) rotate(6deg) scale(1.06); }
+    }
+    @keyframes stageMist{
+      0%{ transform: translate3d(-.8%, .4%, 0) scale(1.01); }
+      100%{ transform: translate3d(.9%, -.6%, 0) scale(1.04); }
     }
 
     /* =========================
-      BLOK 9 — ANGPAO PREMIUM (SVG BUILT-IN) + NO MOTION BLUR
-      - Letter benar-benar di dalam (clip) & ketutup pocket depan
-      - Animasi hanya transform+opacity (tanpa blur/filter berat)
+      BLOK 9 — ANGPAO 3D (UPGRADE: emboss/foil pure CSS, no blur anim)
     ========================== */
     .angpaoWrap{
       position:relative;
@@ -343,139 +403,251 @@
     .angpao{
       --rx: 0deg;
       --ry: 0deg;
+      --lift: 0px;
+      --shineX: 20%;
+      --shineY: 0%;
       width: min(360px, 92vw);
       aspect-ratio: 340 / 230;
       height:auto;
       position:relative;
-      transform: translate3d(0,0,0);
       transform-style:preserve-3d;
+      transform:
+        perspective(980px)
+        translate3d(0,var(--lift),0)
+        rotateX(var(--rx))
+        rotateY(var(--ry));
+      transition: transform .32s var(--easeOut), filter .32s var(--easeOut), opacity .2s var(--easeOut);
+      filter: drop-shadow(0 24px 55px rgba(0,0,0,.55));
       user-select:none;
       cursor:pointer;
       outline:none;
       will-change: transform;
+      contain: layout paint style;
+      z-index:1;
     }
 
-    /* float idle (ringan) */
-    .angpaoIdle{
-      animation: floaty 3.8s var(--easeSoft) infinite;
-    }
+    .angpao *{ backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+
+    .angpaoIdle{ animation: floaty 3.8s var(--easeSoft) infinite; }
     @keyframes floaty{
-      0%{ transform: translate3d(0,0,0); }
-      50%{ transform: translate3d(0,-6px,0); }
-      100%{ transform: translate3d(0,0,0); }
+      0%{ transform: perspective(980px) translate3d(0,0,0) rotateX(var(--rx)) rotateY(var(--ry)); }
+      50%{ transform: perspective(980px) translate3d(0,-6px,0) rotateX(calc(var(--rx) - 1deg)) rotateY(calc(var(--ry) + 1deg)); }
+      100%{ transform: perspective(980px) translate3d(0,0,0) rotateX(var(--rx)) rotateY(var(--ry)); }
     }
 
-    /* Tilt hanya desktop */
-    .angpao.canTilt{
-      transform:
-        perspective(950px)
-        rotateX(var(--rx))
-        rotateY(var(--ry))
-        translate3d(0,0,0);
-      transition: transform .20s var(--easeOut);
-      will-change: transform;
+    .angpao:hover{ --lift: -4px; filter: drop-shadow(0 28px 70px rgba(0,0,0,.62)); }
+    .angpao:active{
+      --lift: -1px;
+      transform: perspective(980px) translate3d(0,var(--lift),0) rotateX(var(--rx)) rotateY(var(--ry)) scale(.992);
     }
 
     .angpao.envDisabled{
       cursor:not-allowed;
-      opacity:.80;
-      filter: grayscale(.10) saturate(.92);
+      opacity:.78;
+      filter: grayscale(.12) saturate(.9) drop-shadow(0 18px 42px rgba(0,0,0,.5));
     }
+    .angpao.isLocked{ pointer-events:none; }
 
-    /* === CLIP AREA === */
-    .envClip{
-      position:absolute;
-      inset:0;
+    /* Body (emboss + bevel rim) */
+    .angpao__body{
+      position:absolute; inset:0;
       border-radius: 22px;
+      background:
+        radial-gradient(240px 160px at 20% 0%, rgba(255,255,255,.10), transparent 60%),
+        linear-gradient(180deg, rgba(255,47,63,.96), rgba(177,18,28,.94));
+      border: 1px solid rgba(255,255,255,.18);
       overflow:hidden;
-      transform: translate3d(0,0,0);
-      box-shadow: 0 24px 55px rgba(0,0,0,.55);  /* lebih ringan dari filter drop-shadow */
-      backface-visibility:hidden;
+      transform: translateZ(0);
     }
-
-    .envLayer{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
+    /* Bevel rim */
+    .angpao__body::before{
+      content:"";
+      position:absolute; inset:10px;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), transparent 40%, rgba(0,0,0,.16)),
+        radial-gradient(240px 220px at 50% 20%, rgba(255,211,110,.12), transparent 62%);
+      border: 1px solid rgba(255,211,110,.22);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,211,110,.10),
+        inset 0 0 18px rgba(255,211,110,.08),
+        inset 0 18px 26px rgba(0,0,0,.12);
+      opacity:.92;
       pointer-events:none;
-      user-select:none;
-      transform: translate3d(0,0,0);
-      backface-visibility:hidden;
+    }
+    /* Emboss lines (premium but ringan) */
+    .angpao__emboss{
+      position:absolute; inset:-30%;
+      background:
+        repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 1px, transparent 1px 10px),
+        repeating-linear-gradient(-45deg, rgba(0,0,0,.05) 0 1px, transparent 1px 12px);
+      opacity:.22;
+      transform: rotate(10deg);
+      mix-blend-mode: overlay;
+      pointer-events:none;
+    }
+    /* Foil motif (pure gradients) */
+    .angpao__foil{
+      position:absolute; inset:-15%;
+      background:
+        radial-gradient(240px 180px at 30% 25%, rgba(255,211,110,.20), transparent 62%),
+        radial-gradient(300px 220px at 70% 70%, rgba(247,178,47,.18), transparent 66%),
+        conic-gradient(from 210deg at 50% 50%,
+          rgba(255,255,255,.00),
+          rgba(255,211,110,.16),
+          rgba(255,255,255,.00),
+          rgba(255,47,63,.10),
+          rgba(255,255,255,.00));
+      mix-blend-mode: screen;
+      opacity:.35;
+      filter: saturate(1.15);
+      pointer-events:none;
     }
 
-    /* SVG / IMG layer sizing */
-    .envLayer svg, .envLayer img{
-      width:100%;
-      height:100%;
-      display:block;
+    /* Pocket folds */
+    .angpao__pocket{
+      position:absolute; left:0; right:0; bottom:0;
+      height: 72%;
+      pointer-events:none;
     }
-    .envLayer img{
-      object-fit:cover;
-      image-rendering:auto;
-      -webkit-user-drag:none;
+    .angpao__pocket::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.00), rgba(0,0,0,.18)),
+        linear-gradient(90deg, rgba(0,0,0,.18), rgba(0,0,0,.00) 20%, rgba(0,0,0,.00) 80%, rgba(0,0,0,.18));
+      opacity:.55;
+    }
+    .angpao__pocket::after{
+      content:"";
+      position:absolute; inset:-4px 0 0;
+      background:
+        linear-gradient(90deg,
+          transparent 0 21%,
+          rgba(255,255,255,.08) 21% 22%,
+          transparent 22% 78%,
+          rgba(255,255,255,.08) 78% 79%,
+          transparent 79% 100%);
+      opacity:.55;
     }
 
-    .envBack{ z-index: 1; }
-    .envFront{ z-index: 4; } /* pocket depan harus menutup letter agar terlihat “di dalam” */
-
-    /* === LETTER (di dalam clip) === */
-    .envLetter{
-      position:absolute;
-      left:14px; right:14px;
-      bottom:12px;
-      height:76%;
-      z-index: 3;
-      transform: translate3d(0,34px,0);
-      will-change: transform;
-      backface-visibility:hidden;
+    /* Shine (moves with pointer) */
+    .angpao__shine{
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(240px 160px at var(--shineX) var(--shineY),
+          rgba(255,211,110,.34), transparent 62%),
+        linear-gradient(120deg, transparent 35%, rgba(255,255,255,.10), transparent 65%);
+      mix-blend-mode: screen;
+      opacity:.62;
+      pointer-events:none;
+      transition: opacity .22s var(--easeOut);
     }
+    .angpao:hover .angpao__shine{ opacity:.92; }
 
-    /* Flap & Seal di luar clip (agar tidak kepotong) */
-    .envFlap{
-      position:absolute;
-      left:0; right:0; top:-2px;
-      height:58%;
-      z-index: 6;
+    /* Flap */
+    .angpao__flap{
+      position:absolute; left:0; right:0; top:-2px;
+      height: 58%;
       transform-origin: 50% 0%;
-      transform: translate3d(0,0,16px) rotateX(0deg);
-      pointer-events:none;
+      transform: translateZ(16px) rotateX(0deg);
+      z-index: 5;
       will-change: transform;
-      backface-visibility:hidden;
     }
-    .envSeal{
+    .angpao__flap::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(240px 140px at 50% 0%, rgba(255,255,255,.12), transparent 62%),
+        linear-gradient(180deg, rgba(255,80,90,.96), rgba(170,14,22,.95));
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      border-top-left-radius: 22px;
+      border-top-right-radius: 22px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-bottom: none;
+      box-shadow: 0 18px 30px rgba(0,0,0,.18);
+    }
+    .angpao__flap::after{
+      content:"";
+      position:absolute; inset:0;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      background:
+        radial-gradient(160px 90px at 45% 10%, rgba(255,211,110,.14), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.18), transparent 60%);
+      opacity:.6;
+      pointer-events:none;
+    }
+
+    /* Seal (gold) */
+    .angpao__seal{
       position:absolute;
       left:50%; top:54%;
-      width:68px; height:68px;
-      transform: translate3d(-50%,-50%,22px);
-      z-index: 7;
-      pointer-events:none;
+      transform: translate3d(-50%,-50%,0) translateZ(22px);
+      width: 68px; height: 68px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 30% 28%, rgba(255,255,255,.22), transparent 45%),
+        radial-gradient(circle at 70% 78%, rgba(0,0,0,.22), transparent 55%),
+        linear-gradient(180deg, rgba(255,211,110,.96), rgba(247,178,47,.96));
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 14px 26px rgba(0,0,0,.42);
+      display:grid;
+      place-items:center;
+      font-weight: 900;
+      letter-spacing:.6px;
+      color: rgba(20,10,10,.86);
+      z-index: 6;
+      transition: opacity .22s var(--easeOut);
       will-change: transform, opacity;
-      backface-visibility:hidden;
+    }
+    .angpao__seal small{
+      display:block;
+      font-weight:800;
+      font-size: 11px;
+      opacity:.92;
+      transform: translateY(1px);
+    }
+    .angpao__seal::after{
+      content:"";
+      position:absolute; inset:-2px;
+      border-radius: 999px;
+      background: conic-gradient(from 180deg, rgba(255,255,255,.12), transparent 35%, rgba(255,255,255,.12));
+      mix-blend-mode: overlay;
+      opacity:.55;
+      pointer-events:none;
     }
 
-    /* ===== Letter Card UI (lebih rapih) ===== */
+    /* Letter wrapper */
+    .angpao__letter{
+      position:absolute;
+      left: 14px; right: 14px;
+      bottom: 12px;
+      height: 76%;
+      transform: translate3d(0,34px,0) translateZ(10px);
+      z-index: 3;
+      opacity: .98;
+      will-change: transform;
+    }
+
     .letterCard{
       height:100%;
       border-radius: 18px;
       background:
-        radial-gradient(200px 140px at 20% 10%, rgba(255,211,110,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.92));
+        radial-gradient(180px 120px at 20% 10%, rgba(255,211,110,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
       border: 1px solid rgba(0,0,0,.08);
-      box-shadow: 0 18px 35px rgba(0,0,0,.22);
+      box-shadow: 0 18px 35px rgba(0,0,0,.25);
       overflow:hidden;
       position:relative;
-      transform: translate3d(0,0,0);
     }
     .letterCard::before{
       content:"";
       position:absolute; inset:-40%;
       background:
-        radial-gradient(circle at 18% 22%, rgba(255,211,110,.22), transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(255,47,63,.14), transparent 45%);
+        radial-gradient(circle at 18% 22%, rgba(255,211,110,.24), transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255,47,63,.16), transparent 45%);
       transform: rotate(10deg);
       opacity:.9;
-      pointer-events:none;
     }
     .letterTopbar{
       position:relative;
@@ -486,14 +658,13 @@
       gap:10px;
       border-bottom: 1px dashed rgba(0,0,0,.10);
       color: rgba(20,10,10,.70);
-      font-weight: 900;
+      font-weight: 800;
       font-size: 12px;
       letter-spacing:.2px;
-      background: rgba(255,255,255,.55);
     }
     .chip{
       border: 1px solid rgba(0,0,0,.10);
-      background: rgba(255,255,255,.72);
+      background: rgba(255,255,255,.65);
       padding: 6px 10px;
       border-radius: 999px;
       display:flex; align-items:center; gap:8px;
@@ -517,7 +688,7 @@
     }
     .amount{
       font-size: clamp(34px, 5.2vw, 44px);
-      font-weight: 1000;
+      font-weight: 900;
       letter-spacing: .2px;
       margin: 4px 0 10px;
       line-height:1.0;
@@ -526,7 +697,7 @@
       font-size: 12.8px;
       color: rgba(20,10,10,.70);
       line-height:1.45;
-      max-width: 44ch;
+      max-width: 38ch;
       margin: 0 auto;
     }
     .subline{
@@ -547,30 +718,32 @@
       100%{ box-shadow: 0 0 0 0 rgba(255,47,63,.00); }
     }
 
-    /* ===== OPEN KEYFRAMES (no blur / no filter) ===== */
+    /* Opening keyframes (NO blur, lebih stabil, ada overshoot kecil) */
     @keyframes sealPop {
-      0%   { transform: translate3d(-50%,-50%,22px) scale(1) rotate(0deg); opacity:1; }
-      55%  { transform: translate3d(-50%,-54%,22px) scale(1.06) rotate(8deg); opacity:1; }
-      100% { transform: translate3d(-50%,-50%,22px) scale(.25) rotate(18deg); opacity:0; }
+      0%   { transform: translate3d(-50%,-50%,0) translateZ(22px) scale(1) rotate(0deg); opacity:1; }
+      55%  { transform: translate3d(-50%,-54%,0) translateZ(22px) scale(1.06) rotate(8deg); opacity:1; }
+      100% { transform: translate3d(-50%,-50%,0) translateZ(22px) scale(.28) rotate(16deg); opacity:0; }
     }
     @keyframes flapFlip {
-      0%   { transform: translate3d(0,0,16px) rotateX(0deg); }
-      70%  { transform: translate3d(0,0,16px) rotateX(166deg); }
-      100% { transform: translate3d(0,0,16px) rotateX(170deg); }
+      0%   { transform: translateZ(16px) rotateX(0deg); }
+      62%  { transform: translateZ(16px) rotateX(176deg); }
+      82%  { transform: translateZ(16px) rotateX(164deg); }
+      100% { transform: translateZ(16px) rotateX(170deg); }
     }
     @keyframes letterRise {
-      0%   { transform: translate3d(0,34px,0); }
-      72%  { transform: translate3d(0,-26px,0); }
-      100% { transform: translate3d(0,-22px,0); }
+      0%   { transform: translate3d(0,34px,0) translateZ(10px); }
+      70%  { transform: translate3d(0,-42px,0) translateZ(10px); }
+      88%  { transform: translate3d(0,-30px,0) translateZ(10px); }
+      100% { transform: translate3d(0,-34px,0) translateZ(10px); }
     }
 
-    .isOpening .envSeal{ animation: sealPop 650ms var(--easeSnappy) forwards; }
-    .isOpening .envFlap{ animation: flapFlip 900ms var(--easePop) forwards; }
-    .isOpening .envLetter{ animation: letterRise 950ms var(--easePop) forwards; }
+    .isOpening .angpao__seal{ animation: sealPop 640ms var(--easeSnappy) forwards; }
+    .isOpening .angpao__flap{ animation: flapFlip 900ms var(--easePop) forwards; }
+    .isOpening .angpao__letter{ animation: letterRise 980ms var(--easePop) forwards; }
 
-    .isOpen .envFlap{ transform: translate3d(0,0,16px) rotateX(170deg); }
-    .isOpen .envLetter{ transform: translate3d(0,-22px,0); }
-    .isOpen .envSeal{ opacity:0; }
+    .isOpen .angpao__flap{ transform: translateZ(16px) rotateX(170deg); }
+    .isOpen .angpao__letter{ transform: translate3d(0,-34px,0) translateZ(10px); }
+    .isOpen .angpao__seal{ opacity:0; }
 
     /* =========================
       BLOK 10 — CTA ROW
@@ -644,8 +817,6 @@
       transform: translateX(-50%) translateY(8px);
       background: rgba(0,0,0,.62);
       border: 1px solid rgba(255,255,255,.14);
-      backdrop-filter: blur(14px) saturate(1.1);
-      -webkit-backdrop-filter: blur(14px) saturate(1.1);
       padding: 10px 12px;
       border-radius: 999px;
       box-shadow: var(--shadow2);
@@ -658,15 +829,14 @@
       font-size: 12.5px;
       color: rgba(255,255,255,.90);
       z-index: 80;
-      max-width: min(92vw, 620px);
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
     }
-    .toast.show{
-      opacity:1;
-      transform: translateX(-50%) translateY(0px);
+    @supports (backdrop-filter: blur(16px)){
+      .toast{
+        backdrop-filter: blur(16px) saturate(1.2);
+        -webkit-backdrop-filter: blur(16px) saturate(1.2);
+      }
     }
+    .toast.show{ opacity:1; transform: translateX(-50%) translateY(0px); }
 
     .modalBack{
       position:fixed; inset:0;
@@ -685,18 +855,23 @@
       visibility:visible;
       pointer-events:auto;
     }
+
     .modal{
       width: min(720px, 100%);
       border-radius: 18px;
       border:1px solid rgba(255,255,255,.16);
-      background: rgba(15,10,25,.86);
-      backdrop-filter: blur(16px) saturate(1.1);
-      -webkit-backdrop-filter: blur(16px) saturate(1.1);
+      background: rgba(15,10,25,.85);
       box-shadow: var(--shadow);
       overflow:hidden;
       transform: translateY(10px) scale(.985);
       transition: transform .22s var(--easeOut);
       will-change: transform;
+    }
+    @supports (backdrop-filter: blur(18px)){
+      .modal{
+        backdrop-filter: blur(18px) saturate(1.2);
+        -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      }
     }
     .modalBack.show .modal{ transform: translateY(0) scale(1); }
 
@@ -718,7 +893,7 @@
     .modalBody li{ margin: 6px 0; }
 
     /* =========================
-      BLOK 13 — CONFETTI CANVAS (MINI)
+      BLOK 13 — CONFETTI CANVAS
     ========================== */
     canvas#confetti{
       position:absolute;
@@ -765,25 +940,27 @@
     @media (max-width: 420px){
       .pill{ width:100%; justify-content:space-between; }
       .input{ min-width: 100%; }
+      .btn{ width:auto; }
       .paneInner{ padding: 14px; }
+      .sparks{ filter: blur(14px) saturate(1.15); }
+      .stage::before{ filter: blur(26px); opacity:.28; }
     }
 
     /* Reduce motion */
     @media (prefers-reduced-motion: reduce){
-      .sparks{ animation:none !important; }
-      .btn, .toast, .modal, .angpao, .envFlap, .envLetter, .envSeal{ transition:none !important; }
+      .sparks, .stage::before, .stage::after, .grain{ animation:none !important; }
+      .btn, .toast, .angpao, .angpao__flap, .angpao__letter, .angpao__seal{ transition:none !important; }
       .angpaoIdle{ animation:none !important; }
       .pulseDot{ animation:none !important; }
-      .isOpening .envSeal,
-      .isOpening .envFlap,
-      .isOpening .envLetter{ animation:none !important; }
+      .isOpening .angpao__seal,
+      .isOpening .angpao__flap,
+      .isOpening .angpao__letter{ animation:none !important; }
     }
   </style>
 </head>
-
 <body>
   <div class="sparks" aria-hidden="true"></div>
-  <div class="noise" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
   <div class="wrap">
     <div class="card" role="application" aria-label="Angpao Keberuntungan 2026">
@@ -837,44 +1014,38 @@
 
             <div class="stage" aria-label="Area Angpao">
               <div class="angpaoWrap">
-                <!-- =========================
-                  ANGPAO PREMIUM (SVG BUILT-IN)
-                  Untuk PNG premium: lihat CONFIG => ENVELOPE_MODE
-                ========================== -->
                 <div id="angpao" class="angpao angpaoIdle envDisabled" role="button" tabindex="0" aria-label="Klik untuk membuka angpao">
+                  <div class="angpao__body">
+                    <div class="angpao__emboss"></div>
+                    <div class="angpao__foil"></div>
+                    <div class="angpao__pocket"></div>
+                    <div class="angpao__shine"></div>
+                  </div>
 
-                  <!-- CLIP: semua isi amplop harus di dalam sini -->
-                  <div class="envClip" aria-hidden="true">
-                    <!-- BACK -->
-                    <div class="envLayer envBack" id="envBackLayer"></div>
+                  <div class="angpao__flap"></div>
 
-                    <!-- LETTER (di dalam) -->
-                    <div class="envLetter">
-                      <div class="letterCard">
-                        <div class="letterTopbar">
-                          <span style="display:flex;align-items:center;gap:10px">
-                            <span class="pulseDot" aria-hidden="true"></span>
-                            HASIL ANGPAO HARI INI
-                          </span>
-                          <span class="chip"><i aria-hidden="true"></i><span id="tierLabelMini">Tier</span></span>
-                        </div>
-                        <div class="letterMain">
-                          <div>
-                            <div class="amount" id="resultAmount">Rp—</div>
-                            <div class="hint" id="resultHint">Klik “Buka Angpao” untuk melihat hasil. Setelah itu kamu bisa claim freebet.</div>
-                            <div class="subline" id="resultSub">1x/hari • tidak ada kupon • freebet aktif 24 jam</div>
-                          </div>
+                  <div class="angpao__seal" aria-hidden="true">
+                    <div>2026<small>ANGPAO</small></div>
+                  </div>
+
+                  <div class="angpao__letter">
+                    <div class="letterCard">
+                      <div class="letterTopbar">
+                        <span style="display:flex;align-items:center;gap:10px">
+                          <span class="pulseDot" aria-hidden="true"></span>
+                          HASIL ANGPAO HARI INI
+                        </span>
+                        <span class="chip"><i aria-hidden="true"></i><span id="tierLabelMini">Tier</span></span>
+                      </div>
+                      <div class="letterMain">
+                        <div>
+                          <div class="amount" id="resultAmount">Rp—</div>
+                          <div class="hint" id="resultHint">Klik “Buka Angpao” untuk melihat hasil. Setelah itu kamu bisa claim freebet.</div>
+                          <div class="subline" id="resultSub">1x/hari • tidak ada kupon • freebet aktif 24 jam</div>
                         </div>
                       </div>
                     </div>
-
-                    <!-- FRONT (pocket menutup letter) -->
-                    <div class="envLayer envFront" id="envFrontLayer"></div>
                   </div>
-
-                  <!-- FLAP + SEAL (di luar clip) -->
-                  <div class="envFlap" id="envFlapLayer" aria-hidden="true"></div>
-                  <div class="envSeal" id="envSealLayer" aria-hidden="true"></div>
                 </div>
 
                 <div class="ctaRow">
@@ -884,8 +1055,8 @@
                 </div>
 
                 <div class="mini" style="justify-content:center; text-align:center">
-                  <span class="tag">Opening: seal → flap → letter (smooth)</span>
-                  <span class="tag">Desktop: hover tilt (ringan)</span>
+                  <span class="tag">Opening: seal → flap → letter (no blur)</span>
+                  <span class="tag">Desktop: hover untuk efek 3D</span>
                 </div>
               </div>
             </div>
@@ -946,7 +1117,7 @@
           <button class="linkBtn" id="copyLink">Copy Link Event</button>
         </div>
         <div class="right">
-          <span>© 2026 Angpao Event • Premium UI</span>
+          <span>© 2026 Angpao Event • UI Upgrade</span>
         </div>
       </div>
     </div>
@@ -976,14 +1147,6 @@
   <script>
     /* =========================
       BLOK 15 — CONFIG
-      ENVELOPE_MODE:
-      - "INLINE_SVG"     => sudah premium & tajam (default, tanpa asset)
-      - "EXTERNAL_PNG"   => pakai PNG premium kamu:
-          taruh file:
-            /assets/angpao/back.png
-            /assets/angpao/front.png
-            /assets/angpao/flap.png
-            /assets/angpao/seal.png
     ========================== */
     const CONFIG = {
       MODE: "DEMO",
@@ -991,8 +1154,7 @@
       PUBLIC_SALT: "ANGPAO-2026-DEMO-SALT",
       CLAIM_TTL_HOURS: 24,
       AMOUNT_STEP: 1000,
-      ENVELOPE_MODE: "INLINE_SVG", // ganti ke "EXTERNAL_PNG" jika kamu sudah punya PNG premium
-      ENVELOPE_BASE_PATH: "assets/angpao"
+      OPEN_ANIM_MS: 980
     };
 
     /* =========================
@@ -1011,7 +1173,6 @@
     ========================== */
     const $ = (s)=>document.querySelector(s);
     const fmtIDR = (n)=>new Intl.NumberFormat("id-ID").format(n);
-    const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function getWibDateKey(){
       const parts = new Intl.DateTimeFormat("en-CA", {
@@ -1033,8 +1194,17 @@
       return next - now.getTime();
     }
 
-    function lsGet(k, f=null){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):f; }catch{ return f; } }
-    function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
+    function lsGet(k, f=null){
+      try{
+        const v=localStorage.getItem(k);
+        return v?JSON.parse(v):f;
+      }catch{
+        return f;
+      }
+    }
+    function lsSet(k, v){
+      try{ localStorage.setItem(k, JSON.stringify(v)); }catch{}
+    }
 
     function toast(msg){
       const t = $("#toast");
@@ -1044,7 +1214,8 @@
       toast._tm = setTimeout(()=>t.classList.remove("show"), 2100);
     }
 
-    function vib(ms=18){
+    const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function vib(ms=20){
       if(prefersReducedMotion) return;
       try{ if("vibrate" in navigator) navigator.vibrate(ms); }catch{}
     }
@@ -1151,7 +1322,7 @@
     }
 
     /* =========================
-      BLOK 22 — CONFETTI (MINI) (ringan)
+      BLOK 22 — CONFETTI (lebih hemat di HP)
     ========================== */
     const confetti = (() => {
       const cv = $("#confetti");
@@ -1165,29 +1336,32 @@
         "rgba(247,178,47,.90)"
       ];
 
+      function getDpr(){
+        return Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+      }
+
       function resize(){
         const r = cv.getBoundingClientRect();
-        cv.width = Math.max(1, Math.floor(r.width * devicePixelRatio));
-        cv.height= Math.max(1, Math.floor(r.height* devicePixelRatio));
+        const dpr = getDpr();
+        cv.width = Math.max(1, Math.floor(r.width * dpr));
+        cv.height= Math.max(1, Math.floor(r.height * dpr));
         W=cv.width; H=cv.height;
       }
       window.addEventListener("resize", resize, { passive:true });
 
-      function pick(a){ return a[(Math.random()*a.length)|0]; }
+      function randPick(a){ return a[(Math.random()*a.length)|0]; }
 
-      function spawn(n=78){
+      function spawn(n=80){
+        const dpr = getDpr();
         parts = [];
         for(let i=0;i<n;i++){
           parts.push({
             x: Math.random()*W,
-            y: -Math.random()*H*0.15,
-            vx: (Math.random()-.5)*1.5*devicePixelRatio,
-            vy: (Math.random()*2.2+1.2)*devicePixelRatio,
-            w: (Math.random()*6+5)*devicePixelRatio,
-            h: (Math.random()*3+2)*devicePixelRatio,
-            rot: Math.random()*Math.PI,
-            vr: (Math.random()-.5)*0.06,
-            color: pick(palette)
+            y: -Math.random()*H*0.2,
+            vx: (Math.random()-.5)*1.5*dpr,
+            vy: (Math.random()*2.2+1.2)*dpr,
+            r: (Math.random()*3.2+1.8)*dpr,
+            color: randPick(palette)
           });
         }
         alive = true;
@@ -1196,21 +1370,16 @@
         if(!alive) return;
         ctx.clearRect(0,0,W,H);
         for(const p of parts){
-          p.x += p.vx; p.y += p.vy; p.vy *= 1.006;
-          p.rot += p.vr;
-
+          p.x += p.vx; p.y += p.vy; p.vy *= 1.008;
           const alpha = Math.max(0, 1 - p.y/(H*1.05));
           ctx.globalAlpha = alpha*0.95;
-
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
           ctx.fillStyle = p.color;
-          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-          ctx.restore();
+          ctx.fill();
         }
         ctx.globalAlpha = 1;
-        parts = parts.filter(p => p.y < H + 60*devicePixelRatio);
+        parts = parts.filter(p => p.y < H + 90);
         if(parts.length) raf = requestAnimationFrame(draw);
         else {
           alive=false;
@@ -1220,7 +1389,8 @@
       function boom(){
         if(prefersReducedMotion) return;
         resize();
-        spawn(82);
+        const isSmall = matchMedia("(max-width: 420px)").matches;
+        spawn(isSmall ? 62 : 88);
         cv.classList.add("confettiOn");
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(draw);
@@ -1230,171 +1400,7 @@
     })();
 
     /* =========================
-      BLOK 23 — SVG PREMIUM ENVELOPE (built-in)
-      (tajam saat zoom, tanpa filter blur berat)
-    ========================== */
-    function svgBack(){
-      return `
-        <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="">
-          <defs>
-            <linearGradient id="bgR" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#ff4553"/>
-              <stop offset="1" stop-color="#b1121c"/>
-            </linearGradient>
-            <linearGradient id="foil" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#fff2c2" stop-opacity=".75"/>
-              <stop offset=".4" stop-color="#ffd36e" stop-opacity=".55"/>
-              <stop offset="1" stop-color="#f7b22f" stop-opacity=".65"/>
-            </linearGradient>
-            <pattern id="patt" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(25)">
-              <rect width="18" height="18" fill="transparent"/>
-              <rect x="0" y="0" width="2" height="18" fill="#ffffff" opacity=".08"/>
-            </pattern>
-          </defs>
-
-          <rect x="6" y="6" width="328" height="218" rx="22" fill="url(#bgR)"/>
-          <rect x="16" y="16" width="308" height="198" rx="18" fill="none" stroke="url(#foil)" stroke-width="1.2" opacity=".9"/>
-
-          <!-- subtle highlight -->
-          <path d="M20 40 C110 0, 210 0, 320 40" fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="10" stroke-linecap="round"/>
-          <rect x="6" y="6" width="328" height="218" rx="22" fill="url(#patt)" opacity=".35"/>
-
-          <!-- gentle vignette -->
-          <radialGradient id="vig" cx="50%" cy="20%" r="80%">
-            <stop offset="0" stop-color="#ffffff" stop-opacity=".10"/>
-            <stop offset="1" stop-color="#000000" stop-opacity=".22"/>
-          </radialGradient>
-          <rect x="6" y="6" width="328" height="218" rx="22" fill="url(#vig)" opacity=".85"/>
-        </svg>
-      `;
-    }
-
-    function svgFront(){
-      return `
-        <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="">
-          <defs>
-            <linearGradient id="frontR" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#ff3b49" stop-opacity=".35"/>
-              <stop offset="1" stop-color="#7e0f16" stop-opacity=".35"/>
-            </linearGradient>
-            <linearGradient id="foil2" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#fff2c2" stop-opacity=".35"/>
-              <stop offset=".55" stop-color="#ffd36e" stop-opacity=".22"/>
-              <stop offset="1" stop-color="#f7b22f" stop-opacity=".28"/>
-            </linearGradient>
-          </defs>
-
-          <!-- pocket front -->
-          <path d="M14 104 H326 V214 Q326 224 316 224 H24 Q14 224 14 214 Z" fill="url(#frontR)"/>
-          <path d="M14 104 L170 178 L326 104" fill="#000" opacity=".10"/>
-          <path d="M14 104 H326" stroke="#ffffff" stroke-opacity=".10" stroke-width="2"/>
-
-          <!-- foil edge -->
-          <path d="M24 116 H316" stroke="url(#foil2)" stroke-width="1.3" opacity=".9"/>
-          <path d="M24 118 H316" stroke="#ffffff" stroke-opacity=".08" stroke-width="1"/>
-          <path d="M24 210 H316" stroke="#000000" stroke-opacity=".18" stroke-width="8" stroke-linecap="round"/>
-
-          <!-- side folds -->
-          <path d="M18 120 V220" stroke="#000" stroke-opacity=".12" stroke-width="6"/>
-          <path d="M322 120 V220" stroke="#000" stroke-opacity=".12" stroke-width="6"/>
-
-          <!-- soft top lip shadow so letter feels inside -->
-          <path d="M14 104 H326" stroke="#000" stroke-opacity=".20" stroke-width="10" stroke-linecap="round"/>
-        </svg>
-      `;
-    }
-
-    function svgFlap(){
-      return `
-        <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="flapR" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#ff5864"/>
-              <stop offset="1" stop-color="#b1121c"/>
-            </linearGradient>
-            <linearGradient id="flapHi" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#ffffff" stop-opacity=".18"/>
-              <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-
-          <path d="M6 6 H334 V128 L170 176 L6 128 Z" fill="url(#flapR)"/>
-          <path d="M10 12 H330 V46 C250 10, 90 10, 10 46 Z" fill="url(#flapHi)" opacity=".8"/>
-          <path d="M6 6 H334" stroke="#fff" stroke-opacity=".10" stroke-width="2"/>
-          <path d="M6 128 L170 176 L334 128" stroke="#000" stroke-opacity=".15" stroke-width="4" stroke-linecap="round"/>
-        </svg>
-      `;
-    }
-
-    function svgSeal(){
-      return `
-        <svg viewBox="0 0 68 68" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="g1" cx="30%" cy="28%" r="70%">
-              <stop offset="0" stop-color="#ffffff" stop-opacity=".25"/>
-              <stop offset=".45" stop-color="#ffd36e" stop-opacity=".90"/>
-              <stop offset="1" stop-color="#f7b22f" stop-opacity=".95"/>
-            </radialGradient>
-          </defs>
-          <circle cx="34" cy="34" r="33" fill="url(#g1)"/>
-          <circle cx="34" cy="34" r="31" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="1.2"/>
-          <path d="M16 22 C26 12, 42 12, 52 22" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="6" stroke-linecap="round"/>
-          <text x="34" y="30" text-anchor="middle" font-family="Inter, system-ui" font-weight="900" font-size="16" fill="#1a0f0f" opacity=".92">2026</text>
-          <text x="34" y="47" text-anchor="middle" font-family="Inter, system-ui" font-weight="900" font-size="10" fill="#1a0f0f" opacity=".85">ANGPAO</text>
-        </svg>
-      `;
-    }
-
-    function mountEnvelope(){
-      const back = $("#envBackLayer");
-      const front = $("#envFrontLayer");
-      const flap = $("#envFlapLayer");
-      const seal = $("#envSealLayer");
-
-      if(CONFIG.ENVELOPE_MODE === "EXTERNAL_PNG"){
-        const base = CONFIG.ENVELOPE_BASE_PATH.replace(/\/$/,"");
-        back.innerHTML  = `<img src="${base}/back.png" alt="" draggable="false">`;
-        front.innerHTML = `<img src="${base}/front.png" alt="" draggable="false">`;
-        flap.innerHTML  = `<img src="${base}/flap.png" alt="" draggable="false" style="width:100%;height:100%;object-fit:cover;display:block">`;
-        seal.innerHTML  = `<img src="${base}/seal.png" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;display:block">`;
-      } else {
-        back.innerHTML  = svgBack();
-        front.innerHTML = svgFront();
-        flap.innerHTML  = svgFlap();
-        seal.innerHTML  = svgSeal();
-      }
-    }
-
-    /* =========================
-      BLOK 24 — POINTER TILT (desktop only)
-    ========================== */
-    function attachTilt(elm){
-      let raf = 0;
-      function onMove(e){
-        if(elm.classList.contains("envDisabled")) return;
-        const r = elm.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width;
-        const y = (e.clientY - r.top) / r.height;
-
-        const ry = (x - 0.5) * 12; // lebih kecil biar tidak blur
-        const rx = (0.5 - y) * 9;
-
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => {
-          elm.style.setProperty("--ry", ry.toFixed(2) + "deg");
-          elm.style.setProperty("--rx", rx.toFixed(2) + "deg");
-        });
-      }
-      function onLeave(){
-        elm.style.setProperty("--ry","0deg");
-        elm.style.setProperty("--rx","0deg");
-      }
-      elm.addEventListener("pointermove", onMove, { passive:true });
-      elm.addEventListener("pointerleave", onLeave, { passive:true });
-    }
-
-    /* =========================
-      BLOK 25 — UI STATE + ACTIONS
+      BLOK 23 — UI STATE
     ========================== */
     const el = {
       modeLabel: $("#modeLabel"),
@@ -1432,19 +1438,25 @@
       opened: false,
       claimed: false,
       shared: false,
+      opening: false,
       result: null
     };
 
     function setEnabled(){
       const hasUser = !!state.user;
+      const locked = state.opening;
+
       el.angpao.classList.toggle("envDisabled", !hasUser || state.claimed);
-      el.openBtn.disabled  = !hasUser || state.claimed;
-      el.claimBtn.disabled = !hasUser || !state.opened || state.claimed;
-      el.shareBtn.disabled = !hasUser || !state.claimed || state.shared;
+      el.angpao.classList.toggle("isLocked", locked);
+
+      el.openBtn.disabled  = !hasUser || state.claimed || locked;
+      el.claimBtn.disabled = !hasUser || !state.opened || state.claimed || locked;
+      el.shareBtn.disabled = !hasUser || !state.claimed || state.shared || locked;
 
       el.chances.textContent = state.user ? (state.claimed ? "0/1" : "1/1") : "—";
       el.statusText.textContent = !state.user ? "Butuh username"
         : state.claimed ? "Sudah claim hari ini"
+        : locked ? "Membuka angpao..."
         : state.opened ? "Hasil siap di-claim"
         : "Siap buka angpao";
     }
@@ -1475,7 +1487,7 @@
     }
 
     function hardResetEnvelopeUI(){
-      el.angpao.classList.remove("isOpening","isOpen");
+      el.angpao.classList.remove("isOpening","isOpen","isLocked");
       el.angpao.classList.add("angpaoIdle");
       el.resultAmount.textContent = "Rp—";
       el.tierLabelMini.textContent = "Tier";
@@ -1490,6 +1502,7 @@
         state.opened = false;
         state.claimed = false;
         state.shared = false;
+        state.opening = false;
         state.result = null;
 
         hardResetEnvelopeUI();
@@ -1504,7 +1517,6 @@
 
     function loadClaimFlags(){
       if(!state.user) return;
-
       const claim = lsGet(kClaim(state.user), null);
       state.claimed = !!claim;
 
@@ -1514,9 +1526,10 @@
       if(state.claimed){
         state.result = claim;
         state.opened = true;
+        state.opening = false;
 
         el.angpao.classList.add("isOpen");
-        el.angpao.classList.remove("angpaoIdle");
+        el.angpao.classList.remove("angpaoIdle","isOpening","isLocked");
 
         el.resultAmount.textContent = "Rp" + fmtIDR(claim.amount);
         el.tierLabelMini.textContent = claim.tierLabel.split("•")[0].trim() || "Tier";
@@ -1524,22 +1537,28 @@
         el.resultSub.textContent = "Masa aktif: 24 jam sejak claim";
       }else{
         state.opened = false;
+        state.opening = false;
         state.result = null;
-        el.angpao.classList.remove("isOpen","isOpening");
+        el.angpao.classList.remove("isOpen","isOpening","isLocked");
         el.angpao.classList.add("angpaoIdle");
       }
     }
 
     function openSequence(){
+      state.opening = true;
+      setEnabled();
+
       el.angpao.classList.remove("isOpen");
-      el.angpao.classList.add("isOpening");
+      el.angpao.classList.add("isOpening","isLocked");
       el.angpao.classList.remove("angpaoIdle");
 
       clearTimeout(openSequence._tm);
       openSequence._tm = setTimeout(() => {
-        el.angpao.classList.remove("isOpening");
+        el.angpao.classList.remove("isOpening","isLocked");
         el.angpao.classList.add("isOpen");
-      }, 980);
+        state.opening = false;
+        setEnabled();
+      }, CONFIG.OPEN_ANIM_MS);
     }
 
     function animateAmount(to){
@@ -1548,11 +1567,12 @@
         return;
       }
       const start = performance.now();
-      const dur = 580;
+      const from = 0;
+      const dur = 650;
       function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
       function step(now){
         const t = Math.min(1, (now - start) / dur);
-        const v = Math.round(to * easeOutCubic(t));
+        const v = Math.round(from + (to - from) * easeOutCubic(t));
         el.resultAmount.textContent = "Rp" + fmtIDR(v);
         if(t < 1) requestAnimationFrame(step);
         else el.resultAmount.textContent = "Rp" + fmtIDR(to);
@@ -1563,6 +1583,7 @@
     function openAngpao(){
       if(!state.user) return toast("Isi dulu username.");
       if(state.claimed) return toast("Kamu sudah claim hari ini.");
+      if(state.opening) return toast("Sedang membuka...");
       if(state.opened) return toast("Hasil sudah terbuka. Silakan claim.");
 
       state.result = computeResultFor(state.user);
@@ -1578,13 +1599,14 @@
 
       openSequence();
       confetti.boom();
-      vib(22);
+      vib(25);
       toast("Angpao terbuka! Claim untuk mengunci hadiah.");
       setEnabled();
     }
 
     function claim(){
       if(!state.user) return toast("Isi dulu username.");
+      if(state.opening) return toast("Tunggu animasi selesai.");
       if(!state.opened || !state.result) return toast("Buka angpao dulu.");
       if(state.claimed) return toast("Sudah claim.");
 
@@ -1601,13 +1623,14 @@
 
       el.resultHint.textContent = `Status: sudah claim • ${payload.tierLabel}`;
       el.resultSub.textContent = "Masa aktif: 24 jam sejak claim";
-      vib(14);
+      vib(18);
       toast("Freebet berhasil di-claim.");
       setEnabled();
     }
 
     function shareWA(){
       if(!state.user) return toast("Username belum ada.");
+      if(state.opening) return toast("Tunggu animasi selesai.");
       if(!state.claimed) return toast("Claim dulu sebelum share.");
       if(state.shared) return toast("Kamu sudah share hari ini.");
 
@@ -1627,7 +1650,7 @@
 
       bumpShared();
       updateCountersUI();
-      vib(12);
+      vib(14);
       toast("Link WhatsApp dibuka. Mantap!");
       setEnabled();
     }
@@ -1658,7 +1681,7 @@
 
       state.user = "";
       el.username.value = "";
-      state.opened=false; state.claimed=false; state.shared=false; state.result=null;
+      state.opened=false; state.claimed=false; state.shared=false; state.opening=false; state.result=null;
 
       hardResetEnvelopeUI();
 
@@ -1671,7 +1694,43 @@
     }
 
     /* =========================
-      BLOK 26 — EVENTS + INIT (hemat CPU)
+      BLOK 24 — POINTER TILT (desktop only)
+    ========================== */
+    function attachTilt(elm){
+      let raf = 0;
+      function onMove(e){
+        if(elm.classList.contains("envDisabled")) return;
+        if(elm.classList.contains("isLocked")) return;
+        const r = elm.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+
+        const ry = (x - 0.5) * 14;
+        const rx = (0.5 - y) * 10;
+
+        const shineX = Math.round(x*100) + "%";
+        const shineY = Math.round(y*100) + "%";
+
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          elm.style.setProperty("--ry", ry.toFixed(2) + "deg");
+          elm.style.setProperty("--rx", rx.toFixed(2) + "deg");
+          elm.style.setProperty("--shineX", shineX);
+          elm.style.setProperty("--shineY", shineY);
+        });
+      }
+      function onLeave(){
+        elm.style.setProperty("--ry","0deg");
+        elm.style.setProperty("--rx","0deg");
+        elm.style.setProperty("--shineX","20%");
+        elm.style.setProperty("--shineY","0%");
+      }
+      elm.addEventListener("pointermove", onMove, { passive:true });
+      elm.addEventListener("pointerleave", onLeave, { passive:true });
+    }
+
+    /* =========================
+      BLOK 25 — EVENTS
     ========================== */
     el.openBtn.addEventListener("click", openAngpao);
     el.claimBtn.addEventListener("click", claim);
@@ -1693,19 +1752,26 @@
 
     $("#copyLink").addEventListener("click", async () => {
       const link = location.href.split("#")[0];
-      try{ await navigator.clipboard.writeText(link); vib(10); toast("Link event berhasil disalin."); }
-      catch{ toast("Gagal copy. Silakan copy manual dari address bar."); }
+      try{
+        await navigator.clipboard.writeText(link);
+        vib(10);
+        toast("Link event berhasil disalin.");
+      }catch{
+        toast("Gagal copy. Silakan copy manual dari address bar.");
+      }
     });
 
-    el.username.addEventListener("keydown", (e)=>{ if(e.key === "Enter"){ e.preventDefault(); saveUser(); } });
+    el.username.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){ e.preventDefault(); saveUser(); }
+    });
 
+    /* =========================
+      BLOK 26 — INIT + TICK
+    ========================== */
     let clockTimer = null;
 
     function init(){
       el.modeLabel.textContent = CONFIG.MODE;
-
-      // mount SVG / PNG premium envelope
-      mountEnvelope();
 
       initDemoCounters();
       updateCountersUI();
@@ -1717,10 +1783,7 @@
       updateCountdown();
 
       const canHover = matchMedia("(hover:hover) and (pointer:fine)").matches;
-      if(canHover && !prefersReducedMotion){
-        el.angpao.classList.add("canTilt");
-        attachTilt(el.angpao);
-      }
+      if(canHover && !prefersReducedMotion) attachTilt(el.angpao);
 
       clearInterval(clockTimer);
       clockTimer = setInterval(() => {
